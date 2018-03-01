@@ -280,17 +280,17 @@ def missing_dep_resolver(key, peer_packages):
 
 
 def generate_substitutions_from_package(
-    package,
-    os_name,
-    os_version,
-    ros_distro,
-    installation_prefix='/usr',
-    deb_inc=0,
-    peer_packages=None,
-    releaser_history=None,
-    fallback_resolver=None,
-    native=False
-):
+        package,
+        os_name,
+        os_version,
+        ros_distro,
+        installation_prefix='/usr',
+        deb_inc=0,
+        peer_packages=None,
+        releaser_history=None,
+        fallback_resolver=None,
+        native=False,
+        with_systemd=False):
     peer_packages = peer_packages or []
     data = {}
     # Name, Version, Description
@@ -333,6 +333,7 @@ def generate_substitutions_from_package(
     data['Conflicts'] = sorted(
         set(format_depends(package.conflicts, resolved_deps))
     )
+    data['with_systemd'] = '--with=systemd' if with_systemd else ''
 
     # Build-type specific substitutions.
     build_type = package.get_build_type()

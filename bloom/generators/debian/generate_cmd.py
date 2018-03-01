@@ -71,6 +71,8 @@ def prepare_arguments(parser):
         help="places debian/* template files only")
     add('--process-template-files', action='store_true',
         help="processes templates in debian/* only")
+    add('--with-systemd', default=False, action='store_true',
+        help='add --with-systemd to debian rules')
     add = parser.add_argument
     add('--os-name', help='OS name, e.g. ubuntu, debian')
     add('--os-version', help='OS version or codename, e.g. precise, wheezy')
@@ -79,13 +81,15 @@ def prepare_arguments(parser):
     return parser
 
 
-def get_subs(pkg, os_name, os_version, ros_distro, native=False):
+def get_subs(pkg, os_name, os_version, ros_distro, native=False,
+             with_systemd=False):
     return generate_substitutions_from_package(
         pkg,
         os_name,
         os_version,
         ros_distro,
-        native=native
+        native=native,
+        with_systemd=with_systemd
     )
 
 
@@ -123,7 +127,8 @@ def main(args=None, get_subs_fn=None):
     for path, pkg in pkgs_dict.items():
         template_files = None
         try:
-            subs = get_subs_fn(pkg, os_name, os_version, ros_distro, args.native)
+            subs = get_subs_fn(pkg, os_name, os_version, ros_distro,
+                               args.native, args.with_systemd)
             if _place_template_files:
                 # Place template files
                 place_template_files(path, pkg.get_build_type())
