@@ -42,6 +42,7 @@ from bloom.logging import error
 from bloom.logging import fmt
 from bloom.logging import info
 
+from bloom.generators.debian.generator import copy_systemd_files
 from bloom.generators.debian.generator import generate_substitutions_from_package
 from bloom.generators.debian.generator import place_template_files
 from bloom.generators.debian.generator import process_template_files
@@ -142,6 +143,8 @@ def main(args=None, get_subs_fn=None):
             if template_files is not None:
                 for template_file in template_files:
                     os.remove(os.path.normpath(template_file))
+            if args.with_systemd:
+                copy_systemd_files('.', ros_distro)
         except Exception as exc:
             debug(traceback.format_exc())
             error(type(exc).__name__ + ": " + str(exc), exit=True)

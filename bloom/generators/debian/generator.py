@@ -34,6 +34,7 @@ from __future__ import print_function
 
 import collections
 import datetime
+import glob
 import io
 import json
 import os
@@ -169,6 +170,24 @@ def place_template_files(path, build_type, gbp=False):
     group = 'bloom.generators.debian'
     templates = os.path.join('templates', build_type)
     __place_template_folder(group, templates, debian_path, gbp)
+
+
+def copy_systemd_files(path, rosdistro):
+    info(fmt("@!@{bf}==>@| Copying systemd files into 'debian' folder."))
+    debian_dir = os.path.join(path, 'debian')
+    if not os.path.exists(debian_dir):
+        sys.exit(
+            "No debian directory found at '{0}', cannot process templates."
+            .format(debian_dir))
+
+    for extension in ('service', 'socket'):
+        for file_ in glob.glob(
+                os.path.join(path, 'systemd', '*.%s' % extension)):
+            destination = os.path.join(debian_dir, 'ros-%s-%s'
+                                       % (rosdistro, os.path.basename(file_)))
+            info("Copying '%s' -> '%s'"
+                 % tuple((os.path.relpath(x) for x in [file_, destination])))
+            shutil.copy(file_, destination)
 
 
 def summarize_dependency_mapping(data, deps, build_deps, resolved_deps):
